@@ -1,0 +1,46 @@
+---
+title: "IS607Week3Assignment_Subsetting Data"
+author: "KarenWeigandt"
+date: "September 9, 2015"
+output: html_document
+---
+
+
+### Bring in csv file as dataframe pbdata
+```{r}
+pbdata <- read.table("https://raw.githubusercontent.com/karenweigandt/IS607/master/kawcopyPittsburghBridgesdataset.csv", sep=",")
+```
+
+### Subset the data choosing 5 of the 13 variables
+```{r}
+pb_subcol_data <- pbdata[, c(1,2,5,10,13)]
+```
+
+### Give the columns meaningful names
+```{r}
+colnames(pb_subcol_data) <- c("Identifier","River","Purpose","Material","Bridge Type")
+```
+
+### Cull dataset to show rows with pittsburgh bridges made of steel
+```{r}
+pb_subrowsteel_data <- pb_subcol_data[which(pb_subcol_data$Material == "STEEL"),]
+```
+
+### Show first 6 rows of steel bridge data
+```{r}
+head(pb_subrowsteel_data)
+
+```
+
+### Or show bridges not made of steel (includes unknown materials)
+```{r}
+pb_subrowNOTsteel_data <- pb_subcol_data[which(pb_subcol_data$Material != "STEEL"),]
+```
+
+### show bridges not made of steel
+```{r}
+pb_subrowNOTsteel_data
+```
+
+
+
