@@ -1,0 +1,142 @@
+---
+title: "IS607Wk4Assignment"
+author: "KarenWeigandt"
+date: "September 15, 2015"
+output:
+  html_document:
+    md_extensions: -tex_math_single_backslash
+---
+
+
+![HW4Assignment](C:\Users\Karen\Pictures\IS607Wk4Assignment.png)
+
+```{r}
+## Install and load stringr package
+install.packages("stringr", dependencies = TRUE, repos = "http://lib.stat.cmu.edu/R/CRAN/")
+library(stringr)
+```
+
+```{r}
+## 4a. [0-9]+\\$
+```
+
+
+[0-9] means it will match any digit, the + means it will match the preceding any one or more times, the  double backslash indicates it will be looking at the special character that follows as a literal character, so it will find any string that starts with any number of digits followed by a dollar sign
+
+The type of string matched by this expression would be a price in the format 15$.  It will list prices as whole numbers, if a price in the character string is done as a decimal, it will not extract the numbers before the decimal point, so  it is important to know what the pricing format is, or it will extract an incorrect value for the price (the change value without the dollars).
+
+An example of this would be as follows:
+
+```{r}
+## Create a vector with different price formats
+
+price <- c("25$", "$60", "24.99$", "16#")
+unlist(str_extract_all(price, "[0-9]+\\$"))
+
+```
+
+
+```{r}
+## 4b. \\b[a-z]{1,4}\\b
+```
+
+
+This should extract any word (double backslash was used to indicate to look for a word edge) made up of no more than 4 lowercase characters, like a to zzzz. A space will indicate the start of a new word, not seen as a character in a word.
+
+```{r}
+word_list <- c("Bob", "car", "blob", "seven", "baby", "ba b", "dadaa", "da da", "el piano")
+unlist(str_extract_all(word_list, "\\b[a-z]{1,4}\\b"))
+```
+
+```{r}
+## 4c. .*?\\.txt$
+```
+
+
+.* means that a single character will be matched zero or more times, the ? means the preceding is optional and will be matched at most once. \\. will match the . as a literal character, followed by txt at the end of the string (indicated by the $)
+
+SO, this returns a single .txt file name, with any number or type of preceding character, and .txt has to be the end of the string
+
+```{r}
+f_names <- c("joe.txt", "*.txt", "*.doc", "a.txtf", "thomas.png", ".txt", ".abc.txt", ".txt.txt", "abc.txt.abc.txt")
+unlist(str_extract_all(f_names, ".*?\\.txt$"))
+
+```
+
+```{r}
+## 4d. \\d{2}/\\d{2}/\\d{4}
+```
+
+
+This extracts 2 digits, then a slash, then 2 digits, then a slash then 4 digits - essentially the date if it is in month/day/year format.  but it will return digits in this format that are not valid dates, and not return valid dates that have less than the correct number of digits
+
+```{r}
+vec_date <- c("Jan 31, 2015", "1/1/1", "15/76/3000", "09/17/2015", "2015/09/17" )
+unlist(str_extract_all(vec_date, "\\d{2}/\\d{2}/\\d{4}"))
+```
+
+```{r}
+## 4e. <(.+?)>.+?</\\1>
+```
+
+(.+?) apply quantifier to a group of characters, enclose in parenthesis - so this means any group of characters
+.+? regardless of what comes in between
+\\1 is 1 backreference - looks for one subsequent occurrence of the quantified  group of characters
+<> indicates the start tag of an element
+</> indicates the end tag
+It will try to find the longest string possible
+
+This code will find HTML and XML elements
+
+```{r}
+x <- c("<abc> defabc <abc>", "<>", "<c>abdef</c>", "<head> <title>HTML Tutorial Example</title> </head>")
+unlist(str_extract_all(x, "<(.+?)>.+?</\\1>"))
+```
+
+5.
+
+```{r}
+price <- c("25$", "$60", "24.99$", "16#")
+unlist(str_extract_all(price, "\\d{1,}\\u0024"))
+
+```
+
+6.
+
+a.
+```{r}
+email_chunks <- unlist(str_extract_all("chunkylover53[at]aol[dot]com", "[[:alnum:]]*"))
+email_chunks
+email_chunks[3] <- "@"
+email_chunks[7] <- "."
+email_addr <- str_c(email_chunks[1],email_chunks[3], email_chunks[5], email_chunks[7], email_chunks[9])
+email_addr
+
+```
+
+b.
+
+```{r - show how expression fails}
+## The following expression fails because it gives only the first digit
+str_extract("chunkylover53[at]aol[dot]com", "[:digit:]")
+
+## This statement gives you each digit individually, but you don't know that they occur together as 53 - you get the same answer for both of the following email addresses
+str_extract_all("chunkylover53[at]aol[dot]com", "[:digit:]")
+str_extract_all("chunky5lover3[at]aol[dot]com", "[:digit:]")
+
+## The following code lets you see if the digits appear together, like 53
+str_extract_all("chunkylover53[at]aol[dot]com", "[:digit:]+")
+str_extract_all("chunky5lover3[at]aol[dot]com", "[:digit:]+")
+
+```
+
+c.
+```{r}
+str_extract_all("chunkylover53[at]aol[dot]com", "\\D+")
+## Uppercase D extracts everything EXCEPT the digits.  we need to use the lowercase letter
+str_extract_all("chunkylover53[at]aol[dot]com", "\\d+")
+## Or if you want them individually
+str_extract_all("chunkylover53[at]aol[dot]com", "\\d")
+```
+
+
