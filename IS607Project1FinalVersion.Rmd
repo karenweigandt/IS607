@@ -1,0 +1,331 @@
+---
+title: "IS607 Project 1 Final Version"
+author: "KarenWeigandt"
+date: "September 26, 2015"
+output: html_document
+---
+### After the opening ceremonies at the 1996 Summer Olympics, 6 dignitaries are sitting down for a meal and discussion turns to performance at previous Summer Olympics.  The dignitaries from Brazil and Denmark begin arguing about which of their countries have performed better over the last 15 years, France and Italy start having the same argument.  Romanian and Australian dignitaries are trying to keep the peace, they insist upon looking at the data. All the dignitaries agree on a system of assessment.  They will look at the number of medals received by each country in the last 15 years, and each gold medal will be awarded a value of 3 points, each silver 2 points and each bronze just one point. Will the final scores show more medals indicates better performance?  Or is it really just gold medals that make the difference?  Who had better performance in the contest Brazil vs. Denmark? France vs. Italy? 
+
+
+```{r}
+## Install needed packages
+install.packages("XML", dependencies = TRUE, repos = "http://lib.stat.cmu.edu/R/CRAN/")
+library(XML)
+install.packages("ggplot2", dependencies = TRUE, repos = "http://lib.stat.cmu.edu/R/CRAN/")
+library(ggplot2)
+install.packages("lattice", dependencies = TRUE, repos = "http://lib.stat.cmu.edu/R/CRAN/")
+library(lattice)
+
+```
+
+
+```{r}
+## 1980
+## scrape the webpage into R - 1980 Olympics medals by Country
+yr1980 <- "http://www.databasesports.com/olympics/games/gamesyear.htm?g=20"
+
+## Parse the data on the webpage
+yr1980_webdata <- readHTMLTable(yr1980, header = TRUE, stringsAsFactors = FALSE)
+
+## Isolate the item of interest - the table that is the 4th element of the website
+yr1980_datatable <- yr1980_webdata[4]
+
+## Convert to a data frame
+yr1980_dframe <- as.data.frame(yr1980_datatable)
+
+## Change data frame column names
+colnames(yr1980_dframe) <- c("Country", "1980.Gold", "1980.Silver", "1980.Bronze", "1980.Total.Medals")
+
+## Change numbers from characters to numerical values
+yr1980_dframe$'1980.Gold' <- as.integer(yr1980_dframe$'1980.Gold')
+yr1980_dframe$'1980.Silver' <- as.integer(yr1980_dframe$'1980.Silver')
+yr1980_dframe$'1980.Bronze' <- as.integer(yr1980_dframe$'1980.Bronze')
+yr1980_dframe$`1980.Total.Medals` <- as.integer(yr1980_dframe$`1980.Total.Medals`)
+
+## str(yr1980_dframe)  ## Check structure of the dataframe
+
+## Subset to include just the countries of interest
+yr1980_dframe_six_countries <- subset(yr1980_dframe, yr1980_dframe$Country == "France"| yr1980_dframe$Country == "Brazil"| yr1980_dframe$Country == "Denmark"|yr1980_dframe$Country == "Italy"| yr1980_dframe$Country == "Romania"| yr1980_dframe$Country == "Australia")
+
+## Sort countries alphabetically
+yr1980_dframe_six_countries <- yr1980_dframe_six_countries[order(yr1980_dframe_six_countries$Country), ]
+
+## Look at data frame
+yr1980_dframe_six_countries
+
+
+```
+
+
+
+```{r}
+## 1984
+## scrape the webpage into R - 1984 Olympics medals by Country
+yr1984 <- "http://www.databasesports.com/olympics/games/gamesyear.htm?g=21"
+
+## Parse the data on the webpage
+yr1984_webdata <- readHTMLTable(yr1984, header = TRUE, stringsAsFactors = FALSE)
+
+## Isolate the item of interest - the table that is the 4th element of the website
+yr1984_datatable <- yr1984_webdata[4]
+
+## Convert to a data frame
+yr1984_dframe <- as.data.frame(yr1984_datatable)
+
+## Change data frame column names
+colnames(yr1984_dframe) <- c("Country", "1984.Gold", "1984.Silver", "1984.Bronze", "1984.Total.Medals")
+
+## Change numbers from characters to numerical values
+yr1984_dframe$'1984.Gold' <- as.integer(yr1984_dframe$'1984.Gold')
+yr1984_dframe$'1984.Silver' <- as.integer(yr1984_dframe$'1984.Silver')
+yr1984_dframe$'1984.Bronze' <- as.integer(yr1984_dframe$'1984.Bronze')
+yr1984_dframe$`1984.Total.Medals` <- as.integer(yr1984_dframe$`1984.Total.Medals`)
+
+## Subset to include just the countries of interest
+yr1984_dframe_six_countries <- subset(yr1984_dframe, yr1984_dframe$Country == "France"| yr1984_dframe$Country == "Brazil"| yr1984_dframe$Country == "Denmark"|yr1984_dframe$Country == "Italy"| yr1984_dframe$Country == "Romania"| yr1984_dframe$Country == "Australia")
+
+## Sort countries alphabetically
+yr1984_dframe_six_countries <- yr1984_dframe_six_countries[order(yr1984_dframe_six_countries$Country), ]
+
+## View dat frame
+yr1984_dframe_six_countries
+
+
+```
+
+
+```{r}
+## Combine the 2 dataframes
+olympic_big_dframe <- merge(yr1980_dframe_six_countries, yr1984_dframe_six_countries)
+
+## View newly created dataframe
+olympic_big_dframe
+
+## View only the first row of the dataframe
+olympic_big_dframe[1, ]
+
+
+```
+
+
+```{r}
+## 1988
+## scrape the webpage into R - 1988 Olympics medals by Country
+yr1988 <- "http://www.databasesports.com/olympics/games/gamesyear.htm?g=22"
+
+## Parse the data on the webpage
+yr1988_webdata <- readHTMLTable(yr1988, header = TRUE, stringsAsFactors = FALSE)
+
+## Isolate the item of interest - the table that is the 4th element of the website
+yr1988_datatable <- yr1988_webdata[4]
+
+## Convert to a data frame
+yr1988_dframe <- as.data.frame(yr1988_datatable)
+
+## Change data frame column names
+colnames(yr1988_dframe) <- c("Country", "1988.Gold", "1988.Silver", "1988.Bronze", "1988.Total.Medals")
+
+## Change numbers from characters to numerical values
+yr1988_dframe$'1988.Gold' <- as.integer(yr1988_dframe$'1988.Gold')
+yr1988_dframe$'1988.Silver' <- as.integer(yr1988_dframe$'1988.Silver')
+yr1988_dframe$'1988.Bronze' <- as.integer(yr1988_dframe$'1988.Bronze')
+yr1988_dframe$`1988.Total.Medals` <- as.integer(yr1988_dframe$`1988.Total.Medals`)
+
+## str(yr1988_dframe)  ## Check structure of the dataframe
+
+## Subset to include just the countries of interest
+yr1988_dframe_six_countries <- subset(yr1988_dframe, yr1988_dframe$Country == "France"| yr1988_dframe$Country == "Brazil"| yr1988_dframe$Country == "Denmark"|yr1988_dframe$Country == "Italy"| yr1988_dframe$Country == "Romania"| yr1988_dframe$Country == "Australia")
+
+## Sort countries alphabetically
+yr1988_dframe_six_countries <- yr1988_dframe_six_countries[order(yr1988_dframe_six_countries$Country), ]
+
+## Look at data frame
+yr1988_dframe_six_countries
+
+
+```
+
+
+```{r}
+## Combine the 2 dataframes
+olympic_big_dframe <- merge(olympic_big_dframe, yr1988_dframe_six_countries)
+
+## View only the first row of the dataframe
+olympic_big_dframe[1, ]
+
+
+```
+
+
+```{r}
+## 1992
+## scrape the webpage into R - 1992 Olympics medals by Country
+yr1992 <- "http://www.databasesports.com/olympics/games/gamesyear.htm?g=23"
+
+## Parse the data on the webpage
+yr1992_webdata <- readHTMLTable(yr1992, header = TRUE, stringsAsFactors = FALSE)
+
+## Isolate the item of interest - the table that is the 4th element of the website
+yr1992_datatable <- yr1992_webdata[4]
+
+## Convert to a data frame
+yr1992_dframe <- as.data.frame(yr1992_datatable)
+
+## Change data frame column names
+colnames(yr1992_dframe) <- c("Country", "1992.Gold", "1992.Silver", "1992.Bronze", "1992.Total.Medals")
+
+## Change numbers from characters to numerical values
+yr1992_dframe$'1992.Gold' <- as.integer(yr1992_dframe$'1992.Gold')
+yr1992_dframe$'1992.Silver' <- as.integer(yr1992_dframe$'1992.Silver')
+yr1992_dframe$'1992.Bronze' <- as.integer(yr1992_dframe$'1992.Bronze')
+yr1992_dframe$`1992.Total.Medals` <- as.integer(yr1992_dframe$`1992.Total.Medals`)
+
+## str(yr1992_dframe)  ## Check structure of the dataframe
+
+## Subset to include just the countries of interest
+yr1992_dframe_six_countries <- subset(yr1992_dframe, yr1992_dframe$Country == "France"| yr1992_dframe$Country == "Brazil"| yr1992_dframe$Country == "Denmark"|yr1992_dframe$Country == "Italy"| yr1992_dframe$Country == "Romania"| yr1992_dframe$Country == "Australia")
+
+## Sort countries alphabetically
+yr1992_dframe_six_countries <- yr1992_dframe_six_countries[order(yr1992_dframe_six_countries$Country), ]
+
+## Look at data frame
+yr1992_dframe_six_countries
+
+
+```
+
+
+
+
+```{r}
+## Combine the 2 dataframes
+olympic_big_dframe <- merge(olympic_big_dframe, yr1992_dframe_six_countries)
+
+## View only the first row of the dataframe
+olympic_big_dframe[1, ]
+
+
+```
+
+
+```{r}
+## Add a column for total Gold medals
+olympic_big_dframe$total.Gold <- mapply(sum, olympic_big_dframe$`1980.Gold`, olympic_big_dframe$`1984.Gold`, olympic_big_dframe$`1988.Gold`, olympic_big_dframe$`1992.Gold`)
+
+## Add a column for total Silver medals
+olympic_big_dframe$total.Silver <- mapply(sum, olympic_big_dframe$`1980.Silver`, olympic_big_dframe$`1984.Silver`, olympic_big_dframe$`1988.Silver`, olympic_big_dframe$`1992.Silver`)
+
+## Add a column for total Bronze medals
+olympic_big_dframe$total.Bronze <- mapply(sum, olympic_big_dframe$`1980.Bronze`, olympic_big_dframe$`1984.Bronze`, olympic_big_dframe$`1988.Bronze`, olympic_big_dframe$`1992.Bronze`)
+
+
+```
+
+
+```{r}
+## Calculate total number of medals
+olympic_big_dframe$'total.Medals' <- olympic_big_dframe$total.Gold + olympic_big_dframe$total.Silver + olympic_big_dframe$total.Bronze
+
+## Calculate overall score
+olympic_big_dframe$Score <- 3 * olympic_big_dframe$total.Gold + 2 * olympic_big_dframe$total.Silver + olympic_big_dframe$total.Bronze
+
+## View updated dataframe
+olympic_big_dframe
+
+```
+
+
+```{r}
+## Write data frame to a csv file that will be saved in the current directory
+write.csv(olympic_big_dframe, file = "olympic_big_dframe.csv", row.names = FALSE)
+
+
+```
+
+
+```{r}
+##  Graphics
+## Create a colorscheme variable
+mycol = c("yellow","gray","brown", "blue")
+
+## Barchart for all countries
+barchart(`total.Gold`+`total.Silver`+`total.Bronze`+`total.Medals`~Country,data=olympic_big_dframe, col = mycol,  main = "Medals by color, Total Medals(blue)", ylab ="Count")
+
+## Barchart showing the individual medals and the medal total
+barchart(`total.Medals`+`Score`~Country,
+         data=olympic_big_dframe,
+         auto.key = TRUE,
+         ylab = "count",
+         main = "Plot of Total Medals and Score")
+
+## Create another colorscheme variable
+mycol3 <- c("yellow", "blue", "green")
+
+## Barchart showing the medal total and the calculated score
+barchart(`total.Gold`+`total.Medals`+`Score`~Country,
+         data=olympic_big_dframe,
+         col = mycol3,
+         ylab = "Count",
+         main = "Gold Medals, Total Medals (blue) and Score (green)")
+
+
+
+```
+
+### We will zoom in on the countries in question for a better view
+
+```{r}
+## Brazil and Denmark isolated for better view
+## Create dataframe including just these 2 countries
+bd_olympic_dframe <- subset(olympic_big_dframe, olympic_big_dframe$Country == "Brazil"| olympic_big_dframe$Country == "Denmark")
+
+## Barchart showing the individual medals and the medal total
+barchart(`total.Gold`+`total.Silver`+`total.Bronze`+`total.Medals`~Country,data=bd_olympic_dframe, col = mycol, main = "Medals by color, Total Medals(blue)", ylab ="Count")
+
+## Barchart showing the medal total and the calculated score
+barchart(`total.Medals`+`Score`~Country,
+         data=bd_olympic_dframe,
+         auto.key = TRUE, ylab = "count",
+         main = "Plot of Total Medals and Score")
+
+## Barchart showing the medal total and the calculated score
+barchart(`total.Gold`+`total.Medals`+`Score`~Country,
+         data=bd_olympic_dframe,
+         col = mycol3,
+         ylab = "Count",
+         main = "Gold Medals, Total Medals (blue) and Score (green)")
+
+```
+
+### Brazil and Denmark won the same number of medals, but Brazil has a higher score because more of their medals were gold.
+
+
+
+```{r}
+
+## France and Italy isolated for better view
+## Create dataframe including just these 2 countries
+bd_olympic_dframe <- subset(olympic_big_dframe, olympic_big_dframe$Country == "France"| olympic_big_dframe$Country == "Italy")
+
+## Barchart showing the individual medals and the medal total
+barchart(`total.Gold`+`total.Silver`+`total.Bronze`+`total.Medals`~Country,data=bd_olympic_dframe, col = mycol, main = "Medals by color, Total Medals(blue)", ylab ="Count")
+
+## Barchart showing the medal total and the calculated score
+barchart(`total.Medals`+`Score`~Country,
+         data=bd_olympic_dframe,
+         auto.key = TRUE, ylab = "count",
+         main = "Plot of Total Medals and Score")
+
+## Barchart showing the medal total and the calculated score
+barchart(`total.Gold`+`total.Medals`+`Score`~Country,
+         data=bd_olympic_dframe,
+         col = mycol3,
+         ylab = "Count",
+         main = "Gold Medals, Total Medals (blue) and Score (green)")
+
+```
+
+### Italy won more gold medals, but the total number of medals won by France is higher. Italy still has a higher calculated score.
+
+### The results here provide an indication that the number of medals won is not always the best predictor of performance based on the assessment tool devised here. In this instance, gold appears to be the gold standard! 
+

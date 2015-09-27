@@ -3,6 +3,5 @@ account: rpubs
 server: rpubs.com
 bundleId:
         https://api.rpubs.com/api/v1/document/110151/11e3ebe8093b4e828f9ad61368e1a11f
-url:
-        http://rpubs.com/publish/claim/110151/f87520eda5024e6a90587400c35270b8
-when: 1442637773.56934
+url: http://rpubs.com/karen_weigandt/110151
+when: 1442638301.65365
