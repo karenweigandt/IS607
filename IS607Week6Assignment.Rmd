@@ -1,0 +1,93 @@
+---
+title: "IS607Week6HW"
+author: "KarenWeigandt"
+date: "October 3, 2015"
+output: html_document
+---
+
+Show the assignment:
+![HW6Assignment](C:\Users\Karen\Pictures\IS607Wk6Assignment.png)
+
+```{r}
+## Install and load tidyr and dplyr packages
+install.packages("tidyr", dependencies = TRUE, repos = "http://lib.stat.cmu.edu/R/CRAN/")
+library(tidyr)
+install.packages("dplyr", dependencies = TRUE, repos = "http://lib.stat.cmu.edu/R/CRAN/")
+library(dplyr)
+```
+
+
+```{r}
+## Read .csv file into variable called airline_data
+airline_data <- read.csv(file = "https://raw.githubusercontent.com/karenweigandt/IS607/master/IS607Week6data.csv", header = TRUE, sep = ",")
+
+## Convert data to tbl class
+airline_data <- tbl_df(airline_data)
+```
+
+
+```{r}
+## Start to make the data tidy - make wide data long
+tidy_airline_data <- gather(airline_data, "city", "Number of flights", 3:7, na.rm = TRUE)
+
+## Check the column names
+colnames(tidy_airline_data)
+
+## Change the names of the unnamed columns to something that makes sense
+names(tidy_airline_data)[names(tidy_airline_data) %in% c("X", "X.1")] <- c("airline", "status")
+
+## Look at the data
+tidy_airline_data  ## Note blank airline cells for delayed rows
+```
+
+
+```{r}
+## Fill in blank airline names to maintain data integrity
+tidy_airline_data$airline <- c("ALASKA", "ALASKA", "AMWEST", "AMWEST")
+```
+
+
+```{r}
+## Look at the data again to see blanks are filled in
+tidy_airline_data
+```
+
+
+```{r}
+## Group by airline
+## Calculate total number of flights per airline
+tidy_al_data_by_al <-     ## Saved to new table to preserve integrity of previous table
+tidy_airline_data %>%
+  group_by(airline) %>%
+  mutate(total_flights_by_airline = sum(`Number of flights`))
+
+##  Look at the new column
+tidy_al_data_by_al$total_flights_by_airline
+
+## Group by airline and then status
+## Calculate percentage of flights for each status for each city
+tidy_al_data_by_al_stat <-    ## Saved to new table to preserve integrity of previous table
+tidy_al_data_by_al %>%
+  group_by(airline, status) %>%
+  mutate(pct_of_flights_by_al_n_stat = `Number of flights` *100 / total_flights_by_airline)
+
+##  Look at the new table
+tidy_al_data_by_al_stat
+tidy_al_data_by_al_stat$pct_of_flights_by_al_n_stat
+```
+
+```{r}
+## Filter latest data set to include only delayed flights
+## Group output by airline
+## Calculate sum of percentages
+tidy_al_data_by_al_stat %>%
+filter(status == "delayed") %>% 
+  group_by(airline) %>% 
+  summarise('%_flights_delayed_by_airline' = sum(pct_of_flights_by_al_n_stat))
+```
+
+### Conclusion:
+### 13.27% of ALASKA airlines flights experience delayed arrival vs.
+### 10.89% of AMWEST flights
+
+
