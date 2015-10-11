@@ -1,0 +1,100 @@
+---
+title: "IS607 Project2 Part3 - Digital US Display Advertising"
+author: "Karen Weigandt"
+date: "October 11, 2015"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    theme: cerulean
+---
+
+## Introduction
+
+The goal for this part of the project is to tidy and transform the data presented on journalism.org so that analysis can be performed, and questions can be answered either textually or using visualizations.
+
+Data Source: [http://www.journalism.org/media-indicators/digital-u-s-display-advertising-by-company/]
+The source above quoted eMarketer "US Ad Spending Forecast", 2012-2014. "US Online Ad Spending", 2011 as its' source for the data.
+
+## Question for Analysis
+
+### One analysis proposed was to compare the data for different companies. The data shows (in billions of dollars) the amount spent on U.S. advertising on 5 media sites over the course of 5 years. 
+
+## Load packages
+```{r, warning=FALSE, message=FALSE}
+## load packages
+library(tidyr)
+library(magrittr)
+library(XML)
+library(stringr)
+library(dplyr)
+library(ggplot2)
+```
+
+## Bring the data into R
+
+Scrape the webpage into R - and at the same time parse the data on the webpage (the data we want is the only table)
+```{r}
+ad_webdata <- readHTMLTable("http://www.journalism.org/media-indicators/digital-u-s-display-advertising-by-company/", header = TRUE, stringsAsFactors = FALSE)
+```
+
+## Data cleaning
+Change data type of the object for easier manipulation and get rid of the buy option selector, which conveniently occurs in every other row
+```{r}
+ad_df <- as.data.frame(ad_webdata)  ## Convert the list to a dataframe
+```
+
+#### Rename columns
+I finally got dplyr to work! It is New_Name = Old_Name!
+```{r}
+## Rename columns for clarity
+ad_df <-
+  dplyr::select(ad_df, Year=NULL., Google=NULL.Google, Facebook=NULL.Facebook, Yahoo=NULL.Yahoo,       Microsoft=NULL.Microsoft, AOL=NULL.AOL, Total=NULL.Total)
+```
+
+#### Clean away unwanted columns
+Since the total column is annual total for all companies, it does not fit with the data I plan to compare.
+```{r}
+## Delete unwanted column 
+ad_df <- ad_df[, -7]  ## Get rid of the total
+```
+
+#### Change data type of year to integer, and the rest of the columns to numeric
+```{r}
+ad_df$Year <- as.integer(ad_df$Year)
+ad_df$Google <- as.numeric(ad_df$Google)
+ad_df$Facebook <- as.numeric(ad_df$Facebook)
+ad_df$Yahoo <- as.numeric(ad_df$Yahoo)
+ad_df$Microsoft <- as.numeric(ad_df$Microsoft)
+ad_df$AOL <- as.numeric(ad_df$AOL)
+```
+
+Prepare data for plotting
+```{r}
+ ## create df where all companies are in a single column, so both can be plotted as y
+ad_for_plot <-  ad_df
+
+ad_for_plot <- 
+  ad_for_plot %>%
+  gather("company", "ad_revenue", 2:6)
+```
+
+
+## Visualization
+```{r}
+ggplot(data=ad_for_plot, aes(x=factor(Year), y=ad_revenue, group=company, color=company, shape=company)) + 
+    xlab("Year") + ylab("Billions of Dollars") + ## Set axis labels
+    ggtitle("Ad Revenue in Billions of Dollars 2009 - 2013") +     ## Set title
+    geom_line(size=1) + 
+    geom_point(size=4, fill="white") +
+    scale_shape_manual(values=c(21,21,21,21,21))
+```
+
+##  Conclusion
+
+#### From the plot we can see that Google and Facebook have had the steepest growth over the five year period in question. Yahoo appears to be fairly stable in revenue. Microsoft and AOL experienced slight growth.  This information about AOL surprised me, because I don't hear about anyone using AOL anymore.
+
+Thanks to Nabila for finding a great resource and an interesting topic to explore!
+
+
+

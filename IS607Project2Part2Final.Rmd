@@ -1,0 +1,96 @@
+---
+title: "IS607  Project 2 Part 2 - Mass Shootings"
+author: "Karen Weigandt"
+date: "October 10, 2015"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    theme: cerulean
+---
+
+## Introduction
+
+The goal for this part of the project is to tidy and transform the data from Matthew Farris' post on mass shootings so that analysis can be performed, and questions can be answered either textually or
+using visualizations.  I will look at the 2015 data up to Oct 1st of this year.
+
+Data Sources: 
+
+[http://shootingtracker.com/wiki/Main_Page]  This contains a link to the csv file with shooting data, including date, number of killed and wounded, etc.
+
+[http://www.washingtonpost.com/news/wonkblog/wp/2015/10/01/2015-274-days-294-mass-shootings-hundreds-dead/] This is a great infographic on a calendar, so you can easily see what day of the week the shootings took place, as well as color coding for levels of the mass shootings.
+
+## Question for Analysis
+
+### One analysis proposed was to look at the data for killed vs. wounded. In the remainder of the document killed is equated to an outcome of death, and wounded to an outcome of injury.
+
+## Load packages
+```{r, warning=FALSE, message=FALSE}
+## load packages
+library(tidyr)
+library(magrittr)
+library(XML)
+library(rvest)
+library(stringi)
+library(stringr)
+library(dplyr)
+library(ggplot2)
+```
+
+## Data Import
+```{r}
+### Bring in csv file as dataframe mass_shoot_2015_df
+mass_shoot_2015_df <- read.csv("https://raw.githubusercontent.com/karenweigandt/IS607/master/2015CURRENTmassshootingdata.csv", sep=",", stringsAsFactors = FALSE)
+```
+This file has 5 columns for associated articles, which are not of interest in the framework of what is to be accomplished here, so these will be removed from the data frame in the next step, data cleanup.
+
+## Data Cleanup
+
+Here I separate the date into month, day and year.  This allows me to create a dataframe where I can calculate the total deaths and injuries by month.
+```{r}
+mass_shoot_2015_df <- mass_shoot_2015_df[, 1:5] #keep all rows, first 5 columns of data
+
+## create a data frame with monthly totals
+monthly_tolls_df <-
+mass_shoot_2015_df %>%
+  separate(Date, c("month","day","year")) %>% 
+  separate(Location, c("city","state"), sep = ",") %>%
+  group_by(month) %>% 
+  summarise(death_toll = sum(Dead), injury_toll = sum(Injured))
+  
+monthly_tolls_df$month <- as.integer(monthly_tolls_df$month) ## change data type for easy ordering
+
+monthly_tolls_df <- arrange(monthly_tolls_df, month) ## put the months in numerical order
+```
+
+## Tabular assessment of the death and injury tolls by month(numeric)
+```{r}
+monthly_tolls_df
+```
+
+Prepare data for plotting
+```{r}
+ ## create df where death and injury tolls are in a single column, so both can be plotted as y
+toll_for_plot <-  monthly_tolls_df
+colnames(toll_for_plot) <- c("month", "death", "injury")
+
+toll_for_plot <- 
+  toll_for_plot %>%
+  gather("outcome", "toll", 2:3)
+```
+
+## Visualization
+```{r}
+ggplot(data=toll_for_plot, aes(x=factor(month), y=toll, group=outcome, color=outcome, shape=outcome)) + 
+    xlab("Month as Numeric") + ylab("Toll Count") + ## Set axis labels
+    ggtitle("2015 Death and Injury by Month for Mass Shootings through Oct 1st") +     ## Set title
+    geom_line(size=1.5) + 
+    geom_point(size=3, fill="white") +
+    scale_shape_manual(values=c(22,21))
+```
+
+##  Conclusion
+
+#### In this data set, the month of October only counts October 1st, so no assessments can be made for the month based on the data present.  The death toll was lowest in April, followed by March.  It is fairly consistent in the other months of 2015.  It is interesting to note that in the summer months (May through August), the number of injuries is consistently more than 3 times the number of deaths.  Could weather be a factor in mass shooting injuries?  
+
+This data set provides many opportunities to tidy and reshape data for exploration.  We could also look at the data by city, or compare year over year data.  Many thanks to Matthew for a great data set!

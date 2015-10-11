@@ -1,0 +1,171 @@
+---
+title: "IS607 Project2 Part1 - NY Times Bestseller List"
+author: "Karen Weigandt"
+date: "October 7, 2015"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    theme: cerulean
+---
+
+## Introduction
+
+The goal for this part of the project is to tidy and transform the data from the New York Times Bestseller Fiction
+List from October 4, 2015 so that analysis can be performed, and questions can be answered either textually or
+using visualizations.
+
+Data Source: [http://www.nytimes.com/best-sellers-books/2015-10-04/combined-print-and-e-book-fiction/list.html]
+
+Below is a snapshot of a portion of the webpage, so you can see the format of the list
+![Website snapshot](C:\Users\Karen\Pictures\NYTBSWebsitesnap.png)
+
+## Load packages
+```{r, warning=FALSE, message=FALSE}
+## load packages
+library(tidyr)
+library(magrittr)
+library(XML)
+library(rvest)
+library(stringi)
+library(stringr)
+library(dplyr)
+library(ggplot2)
+```
+
+## Bring the data into R
+
+Scrape the webpage into R - New York Times Best Sellers Fiction 10/4/15, and at the same time parse the data on the webpage (the data we want is the only table)
+```{r}
+nyt_bs_100415_webdata <- readHTMLTable("http://www.nytimes.com/best-sellers-books/2015-10-04/combined-print-and-e-book-fiction/list.html", header = TRUE, stringsAsFactors = FALSE)
+```
+
+## Data cleaning
+
+Change data type of the object for easier manipulation and get rid of the buy option selector, which conveniently occurs in every other row
+```{r}
+nyt_bs_100415_df <- as.data.frame(nyt_bs_100415_webdata)  ## Convert the list to a dataframe
+
+## Remove the rows that only have the buy button
+nyt_bs_100415_df_2 <- nyt_bs_100415_df[seq(1, NROW(nyt_bs_100415_df), by = 2),]
+```
+
+#### Parse the book information for each of the 15 novels on the list. 
+Keep only the title, author and publisher. Store them in separate variables.  This uses regular expressions for the parsing, and the stringi function included as part of the tidyr package.
+```{r}
+## Loop to extract and clean up publisher, author and title data for each book
+i=1
+for (i in 1:15){
+  
+  ## Title
+  nyt_bs_100415_df_2$Title[i] <- str_extract_all(nyt_bs_100415_df_2$NULL.Combined.Print...E.Book.Fiction[i],   "[:print:]+, by")[[1]]
+  nyt_bs_100415_df_2$Title[i] <- stri_sub(nyt_bs_100415_df_2$Title[i], 1, -5)
+  
+  ## Author
+   nyt_bs_100415_df_2$Author[i] <- str_extract_all(nyt_bs_100415_df_2$NULL.Combined.Print...E.Book.Fiction[i],   "by.*?\\(")[[1]]
+   nyt_bs_100415_df_2$Author[i] <- stri_sub(nyt_bs_100415_df_2$Author[i], 4, -4)
+  
+  ## Publisher
+  nyt_bs_100415_df_2$Publisher[i] <- str_extract_all(nyt_bs_100415_df_2$NULL.Combined.Print...E.Book.Fiction[i],   "\\(.*?\\)")[[1]]
+  nyt_bs_100415_df_2$Publisher[i] <- stri_sub(nyt_bs_100415_df_2$Publisher[i], 2, -3)
+  
+  i = i + 1
+}
+
+```
+
+#### Clean away unnecessary columns
+```{r}
+## Delete unnecessary columns (highest column number first!)
+nyt_bs_100415_df_2 <- nyt_bs_100415_df_2[, -4]  ## Get rid of combined information column
+nyt_bs_100415_df_2 <- nyt_bs_100415_df_2[, -2]  ## Get rid of empty column
+```
+
+#### Rename columns
+I am looking for suggestions here, I could not get the dplyr rename function to work.  I tried select to rename only the ones I wanted to rename, but it gave me an error - unknown variable.
+```{r}
+## Rename columns for clarity (tried using dplyr::rename but couldn't make it work)
+colnames(nyt_bs_100415_df_2) <- c("Rank_this_week", "Rank_last_week", "Weeks_on_list", "Title", "Author", "Publisher")
+```
+
+#### Ensure data types are appropriate for downstream processing
+```{r}
+## Unlist the list type variables
+nyt_bs_100415_df_2$Publisher <- unlist(nyt_bs_100415_df_2$Publisher)
+nyt_bs_100415_df_2$Title <- unlist(nyt_bs_100415_df_2$Title)
+
+## Convert character data to integers where appropriate (it fills in NA automatically where I wanted)
+nyt_bs_100415_df_2$Rank_this_week <- as.integer(nyt_bs_100415_df_2$Rank_this_week)
+nyt_bs_100415_df_2$Rank_last_week <- as.integer(nyt_bs_100415_df_2$Rank_last_week)
+nyt_bs_100415_df_2$Weeks_on_list <- as.integer(nyt_bs_100415_df_2$Weeks_on_list)
+```
+
+## Check out the data
+```{r}
+nyt_bs_100415_df_2
+```
+### Nice and tidy!
+
+#### Data frame as a table for easier viewing
+```{r, fig.width=8}
+## tbl for better printing
+nyt_bs_100415_df_2 <- tbl_df(nyt_bs_100415_df_2)
+nyt_bs_100415_df_2
+```
+
+#### Rearrange the columns
+Use dplyr to change the column order to show the data in each observation in a reasonably arranged format - by rank on the list, then the book title, associated author and publisher, and finally its rank last week and number of weeks on the list.  The last column isn't needed for any of the questions we will answer here, but I left it because I like it.  
+```{r, fig.width=8}
+## Reorder columns
+select(nyt_bs_100415_df_2, Rank_this_week, Title, Author, Publisher, everything())
+glimpse(nyt_bs_100415_df_2)
+```
+
+## Questions and Analysis
+
+### What books were new to the list this week, and what was their rank?
+
+Rank and Title of books new to the New York Times Bestseller List - Fiction
+```{r}
+new_ranked <-
+  nyt_bs_100415_df_2 %>%
+    filter(is.na(Rank_last_week)) %>%
+    select(Rank_this_week, Title)
+
+new_ranked
+
+new_ranked_barplot <- qplot(x=Title, y=factor(Rank_this_week),
+                       data=new_ranked, geom="bar", stat="identity",
+                       position="dodge")
+
+new_ranked_barplot + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+
+```
+
+### What was the gain or loss for the books that were not new to the list?
+
+```{r}
+changed_rank <-
+  nyt_bs_100415_df_2 %>%
+    filter(!is.na(Rank_last_week)) %>%
+    mutate(Change_in_Rank = Rank_last_week - Rank_this_week) %>%
+    select(Title, Change_in_Rank)
+
+changed_rank
+
+changed_rank_barplot <- qplot(x=Title, y=Change_in_Rank,
+                       data=changed_rank, geom="bar", stat="identity",
+                       position="dodge")
+
+changed_rank_barplot + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) +
+  scale_y_continuous(breaks=c(2, 0, -2, -4, -6, -8))
+```
+
+## Conclusion
+
+#### From the analysis and visualizations we can easily see that there were 6 books new to the list this week, and how they ranked.  We also see that only one previously listed book gained in rank, and that most titles fell in rank from the previous week. 
+
+This type of list shows up on many websites, so I wanted to gain some experience scraping and tidying data presented in this format. Working with this data set taught me a lot about using dplyr. I like the pipe operator and the clarity and ease it provides. I think there is a lot more that I can learn by working with this data set, and others like it. One thing I would be interested in learning in the near future is how to present a visually pleasing table in R markdown.
+
+
+
