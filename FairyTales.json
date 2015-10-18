@@ -1,7 +1,7 @@
 {"Fairy and Folk Tales":[
 	{
 	"book" : "Grimms Complete Fairy Tales",
-	"author" : {"Jacob Grimm" "Wilhelm Grimm"},
+	"author" : ["Jacob Grimm", "Wilhelm Grimm"],
 	"publisher" : "Canterbury Classics",
 	"pages" : "652"
 	},
