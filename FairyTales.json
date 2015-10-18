@@ -1,7 +1,7 @@
-{Fairy and Folk Tales":[
+{"Fairy and Folk Tales":[
 	{
 	"book" : "Grimms Complete Fairy Tales",
-	"author : {
+	"author" : {
 		"Jacob Grimm",
 		"Wilhelm Grimm"
 		},
@@ -10,13 +10,13 @@
 	},
 	{
 	"book" : "Hans Christian Andersen's Complete Fairy Tales",
-	"author : "Hans Christian Andersen",
+	"author" : "Hans Christian Andersen",
 	"publisher" : "Canterbury Classics",
 	"pages" : "784"
 	},
 	{
 	"book" : "Tikki Tikki Tembo",
-	"author : "Arlene Mosel",
+	"author" : "Arlene Mosel",
 	"publisher" : "Square Fish",
 	"pages" : "48"
 	}]
