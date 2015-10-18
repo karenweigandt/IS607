@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Fairy_and_Folk_Tales>
+  <book id="1">
+    <name>Grimms Complete Fairy Tales</name>
+    <author first="Jacob Grimm" second="Wilhelm Grimm"/>
+    <publisher>Canterbury Classics</publisher>
+    <pages>652</pages>
+  </book>
+  <book id="2">
+    <name>Hans Christian Andersen's Complete Fairy Tales</name>
+    <author>Hans Christian Andersen</author>
+    <publisher>Canterbury Classics</publisher>
+    <pages>784</pages>
+  </book>
+  <book id="3">
+    <name>Tikki Tikki Tembo</name>
+    <author>Arlene Mosel</author>
+    <publisher>Square Fish</publisher>
+    <pages>48</pages>
+  </book>
+</Fairy_and_Folk_Tales>
