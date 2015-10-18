@@ -1,0 +1,48 @@
+---
+title: "IS607 Week 8 Assignment"
+author: "KarenWeigandt"
+date: "October 17, 2015"
+output: html_document
+---
+
+Create 3 data files, storing the same information in 3 different formats : an html table, xml and json.
+Load data from the 3 files  into separate R dataframes.
+Are the three dataframes identical?
+
+First we load packages that we will be using
+```{r}
+library(XML)
+library(plyr)
+library(jsonlite)
+```
+
+
+we will start with the html table
+```{r}
+html_info_source <- "https://raw.githubusercontent.com/karenweigandt/IS607/master/FairyTales.html" ## Get the source file
+html_info <- readLines(con = html_info_source) ## Read the info into a variable
+html_info_2 <- readHTMLTable(html_info, stringsAsFactors = FALSE) ## extract the table info
+html_info_df <- as.data.frame(html_info_2) ## convert list to data frame 
+html_info_df
+```
+
+Next the xml file
+```{r}
+xml_info_source <- "https://raw.githubusercontent.com/karenweigandt/IS607/master/FairyTales.xml" ## Get the source file
+xml_info <- readLines(con = xml_info_source) ## Read the info into a variable
+xml_info_2 <- xmlToList(xml_info) ## Read the info into a list variable to maintain the list of 2 author names
+xml_info_df <- ldply(xmlToList(xml_info), data.frame) ## convert list to data frame
+xml_info_df
+```
+
+And last, the json file
+```{r}
+json_info_source <- fromJSON("https://raw.githubusercontent.com/karenweigandt/IS607/master/FairyTales.json") ## Get the source file
+json_info_df <- data.frame(json_info_source, stringsAsFactors = FALSE)  ## make a dataframe
+json_info_df
+```
+
+One thing I noticed with json is that the package you try makes a huge difference. 
+I am also not quite sure why for the html and xml files it tells me my final line is incomplete.
+
+The 3 data frames are definitely not identical.
