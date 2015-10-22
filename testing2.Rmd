@@ -1,0 +1,41 @@
+---
+title: "Producers Guild Awards"
+author: "KarenWeigandt"
+date: "October 17, 2015"
+output: html_document
+---
+
+This code is to pull the data for the Producers Guild Best Theatrical Motion Picture Award from the source website
+Data Source: [https://en.wikipedia.org/wiki/Producers_Guild_of_America_Award]
+https://en.wikipedia.org/wiki/Producers_Guild_of_America_Award_for_Best_Theatrical_Motion_Picture]
+
+```{r}
+library(XML)
+library(rvest)
+library(magrittr)
+
+```
+
+```{r}
+pga_best_picture <- read_html("https://en.wikipedia.org/wiki/Producers_Guild_of_America_Award")
+
+b <- pga_best_picture %>% 
+  html_node("#Theatrical_Motion_Picture")
+            
+            #mw-content-text :nth-child(1)") %>% 
+  html_text()
+b <- pga_best_picture %>% 
+  html_node(.mainarticle+ ul b , .mainarticle , #Theatrical_Motion_Picture)
+
+b <- pga_best_picture %>% 
+  html_node(.mainarticle+ ul b)
+```
+
+
+
+
+```{r}
+x <- readHTMLtable("https://en.wikipedia.org/wiki/Producers_Guild_of_America_Award_for_Best_Theatrical_Motion_Picture", header = TRUE, stringsAsFactors = FALSE)
+
+```
+
