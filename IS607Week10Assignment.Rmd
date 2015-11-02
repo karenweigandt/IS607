@@ -1,0 +1,26 @@
+---
+title: "IS 607 Week 10 Assignment"
+author: "KarenWeigandt"
+date: "October 30, 2015"
+output: html_document
+---
+
+Choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it to an R dataframe.
+
+The following code accesses the New York Times Book Reviews for the author Lee Child, and stores them in a dataframe in R.
+
+```{r}
+library(jsonlite)
+
+nyt_book_key <- "&api-key=15c2827997f9e1400c5cc5cd88af8111:7:73337648" ## store the api key so the API can be accessed
+url <- "http://api.nytimes.com/svc/books/v3/reviews.json?author=Lee%20Child" ## web address to access using author name 
+book_review_request <- fromJSON(paste0(url, nyt_book_key))  ## make the request, submit the API key and bring info into r
+lee_child_nyt_book_reviews <- book_review_request$results  ## store the results, culling extraneous info
+
+head(lee_child_nyt_book_reviews, 2) ## View the first 2 rows of the data frame
+
+lee_child_nyt_book_reviews[c("book_title", "summary")] ## View 2 columns of interest from the data frame
+
+```
+
+
