@@ -1,0 +1,101 @@
+---
+title: "IS607 Final Project Proposal"
+author: "KarenWeigandt"
+date: "November 21, 2015"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    theme: cerulean
+---
+
+###Project Title:
+
+
+Satire and Data Science : An Exploration into one of the Current Final Frontiers
+
+
+###Project Participants: 
+
+
+Joy Payton and Karen Weigandt
+
+###Motivation and Inspiration:
+
+
+This project is inspired by the Hutzler 571 Banana Slicer, and other products that really do exist, as hard as it is to believe (like bic cristal for her pens and theft deterrent moldy sandwich bags) .  Joy Payton is the originator of the idea for the analysis, and Karen Weigandt is a collector of kitchen gadgets of the incredibly useless variety.
+
+
+This project is actually not only fun and entertaining, it is based on real social need.  Satire is used as a tool to inspire change through humor and wit.  It allows us to look at situations with a critical eye, and hopefully grow with the introspection that naturally follows.  For many in the Asperger's and autism community, this understanding does not come naturally, though the capability and intelligence lies within.  In learning how to break it down into something that can be analyzed by a computer, we need to dissect the elements down into teachable moments, and this is a process that can be useful in a variety of situations, as our society and interactions become more complex as time goes on.
+
+
+###Project Goals:
+
+
+In this project, we plan to examine satire in amazon reviews and/or news websites, and attempt to teach a computer to recognize what many humans cannot.  This way, people will be able to figure out when we are making fun of them, which is intrinsically satisfying to satirists, especially if those being made fun of could not figure it out on their own. 
+The desired outcome is that we gain knowledge of data science concepts, both within and beyond those encountered in the IS607 curriculum. We hope to execute a data science workflow that includes obtaining data through webscraping and/or using tools like APIs and existing public databases, scrubbing, exploring and modeling the data using a variety of packages available in R, and finally interpreting the data using statistical and visualization tools to present our findings and conclusions.
+
+
+###Sources:
+
+
+The following sources may be used, as well as others that come to light as the project develops.
+
+
+####For product reviews:
+
+[http://www.amazon.com]
+
+perhaps other review sites like [http://www.buzzillions.com] or product specific wesites like Williams sonoma for kitchen gadgets,  or [http://www.staples.com] for office supply reviews.
+
+
+###For news articles:
+
+
+Satire News Sites
+
+
+[http://www.huffingtonpost.com/news/satire/]
+
+[http://www.theonion.com]
+
+[http://www.newyorker.com/humor/borowitz-report]
+
+
+Non-Satire (Real) News Sites
+
+
+[http://www.nytimes.com]
+
+[http://www.cnn.com]
+
+[http://huffingtonpost.com/news] (with the exception of /satire)
+
+
+The intent is to have matching corpora (like-to-like for comparable product types if necessary). 
+
+
+###Proposed Methodology
+
+
+The proposed methodology is supervised machine learning with an ensemble approach for increased accuracy. The initial approach is based in the bag-of-words paradigm.
+
+* Screen scrape a number of stories from satire and real news sites, separating them in a file system according to their source
+* Create a training subset of a random sample of satire and real news site
+* Use R's tm package to create corpora and execute a corpus cleaning algorithm and other required preprocessing
+* Create a term matrix
+*	Attempt various combinations of classification algorithms using RTextTools
+
+If a bag of words approach proves to fail as a classification method, we can consider adding the following classification factors:
+
+*	Use of non-standard punctuation or capitalization as data
+*	Term proximity evaluation
+*	Advanced tokenization based on ontology or phrase extraction
+*	Semantic or sentiment analysis
+
+###A note on reproducible research:
+
+In addition, our intent is for our project to be reproducilble, and tools and provisions will be made available with this in mind.  Please enjoy  the link below on data management, we plan to do the opposite to the best of our ability.
+
+[http://ivory.idyll.org/blog/data-management.html}
+
