@@ -1,0 +1,108 @@
+---
+title: "IS607Wk11ClassificationAssignment"
+author: "KarenWeigandt"
+date: "November 22, 2015"
+output: html_document
+---
+
+```{r}
+# tm package to work with text mining
+install.packages("tm", dependencies = TRUE, repos = "http://lib.stat.cmu.edu/R/CRAN/")
+library(tm)
+
+install.packages("quanteda", dependencies = TRUE, repos = "http://lib.stat.cmu.edu/R/CRAN/")
+library(quanteda)
+
+library(stringr)
+
+options(stringsAsFactors = FALSE)
+```
+
+
+Bring in files to create corpus
+```{r}
+# create variable to increment filenames appopriately
+fnameinc <- as.character(c("001":"200"))
+fnameinc <- str_pad(fnameinc, 3, pad = "0")
+
+# bring in files related to ctaegory business 
+for(i in 1:200) {
+
+  fname1 <- paste0("https://raw.githubusercontent.com/karenweigandt/IS607/master/bbc/business", "/", fnameinc[i], ".txt")
+  fname2 <- paste0("C:/Users/Karen/Documents/Classification", "/business-", fnameinc[i], ".txt")
+  download.file(fname1, fname2)
+}
+
+
+# bring in files related to category entertainment 
+for(i in 1:200) {
+
+  fname3 <- paste0("https://raw.githubusercontent.com/karenweigandt/IS607/master/bbc/entertainment", "/", fnameinc[i], ".txt")
+  fname4 <- paste0("C:/Users/Karen/Documents/Classification", "/entertainment-", fnameinc[i], ".txt")
+  download.file(fname3, fname4)
+} 
+```
+
+
+```{r}
+# loading files using textfile function from quanteda package
+
+docvars(myfiles, "Category") <- substring(names(myfiles), 15)
+docvars(myfiles, "filenum") <- as.integer(substring(names(myfiles), 1, 3))
+
+myfiles <- textfile("C:/Users/Karen/Documents/Classification/*.txt", docvarsfrom="filenames", dvsep = "-") # creates a corpus source object, associating document level variables obtained from the filename - category is the docvar of interest to me
+
+myfiles_corp <- corpus(myfiles) # create the corpus
+
+mydfm <- dfm(myfiles_corp, ignoredFeatures = stopwords("english"), stem=TRUE) # dfm automatically applies toLower and removes punctuation
+
+
+```
+
+Create a data frame from the document term matrix data
+```{r}
+my_df2 <- as.data.frame(mydfm)
+
+category <- as.character() 
+
+for(i in 1:200) {
+  category[i] <- "business"
+}
+for(i in 201:400) {
+  category[i] <- "entertainment"
+}
+
+my_df2 <- cbind(my_df2, category)
+```
+
+
+
+
+Create document term matrices for training and testing
+```{r}
+df_train_2 <- my_df2[1:300,]
+df_train_2 <- df_train_2[-101:-200,]
+
+
+df_test_2 <- my_df2[120:359,]
+df_test_2 <- df_test_2[-170:-309,]
+df_test_2 <- df_test_2[, -9085]
+
+```
+
+
+Above I have what I think are training and test dataframes for use in modelling.
+
+The final step would be to run models
+
+```{r}
+install.packages("e1071", dependencies = TRUE, repos = "http://lib.stat.cmu.edu/R/CRAN/")
+library(e1071)
+model <- svm(category ~ ., data = df_train_2)
+summary(model)
+
+pred <- predict(model, )
+```
+
+
+
